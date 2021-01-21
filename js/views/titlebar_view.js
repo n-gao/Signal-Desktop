@@ -1,4 +1,4 @@
-// Copyright 2017-2020 Signal Messenger, LLC
+// Copyright 2017-2021 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 
 /* global Whisper */
@@ -19,10 +19,6 @@
       },
       initialize() {
         this.render();
-        // const remote = require('electron').remote;
-        // const win = remote.getCurrentWindow();
-        // this.remote = remote;
-        // this.win = win;
         window.subscribeToMaximizeStatusChange(status => this.onMaximizeStatusChanged(status));
       },
       render_attributes() {
@@ -46,6 +42,7 @@
         window.shutdown();
         e.stopPropagation();
       },
+
       onMaximizeStatusChanged(status) {
         if (status) {
           this.$el[0].classList.add("maximized");
