@@ -293,6 +293,7 @@ async function createWindow() {
     height: DEFAULT_HEIGHT,
     minWidth: MIN_WIDTH,
     minHeight: MIN_HEIGHT,
+    frame: OS != 'win32',
     autoHideMenuBar: false,
     titleBarStyle:
       getTitleBarVisibility() === TitleBarVisibility.Hidden
@@ -416,6 +417,15 @@ async function createWindow() {
     mainWindow.webContents.openDevTools();
   }
 
+  function sendMaximizeStatus() {
+    console.log("hello world?=!");
+    mainWindow.webContents.send('maximize-status', mainWindow.isMaximized());
+  }
+  mainWindow.on('maximize', sendMaximizeStatus);
+  mainWindow.on('unmaximize', sendMaximizeStatus);
+  mainWindow.on('enter-full-screen', sendMaximizeStatus);
+  mainWindow.on('leave-full-screen', sendMaximizeStatus);
+
   handleCommonWindowEvents(mainWindow);
 
   // App dock icon bounce
@@ -437,6 +447,7 @@ async function createWindow() {
     ) {
       return;
     }
+
 
     // Prevent the shutdown
     e.preventDefault();
@@ -1269,6 +1280,20 @@ ipc.on('restart', () => {
 });
 ipc.on('shutdown', () => {
   app.quit();
+});
+
+ipc.on('minimize', () => {
+  mainWindow.minimize();
+});
+ipc.on('maximize', () => {
+  console.log("maximize");
+  mainWindow.maximize();
+});
+ipc.on('restore', () => {
+  mainWindow.restore();
+});
+ipc.handle('is-maximized', async () => {
+  return mainWindow.isMaximized();
 });
 
 ipc.on('set-auto-hide-menu-bar', (event, autoHide) => {

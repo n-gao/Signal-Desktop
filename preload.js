@@ -77,6 +77,12 @@ try {
     });
   };
 
+  window.subscribeToMaximizeStatusChange = fn => {
+    ipc.on('maximize-status', (event, status) => {
+      fn(status);
+    });
+  };
+
   window.isBeforeVersion = (toCheck, baseVersion) => {
     try {
       return semver.lt(toCheck, baseVersion);
@@ -139,6 +145,24 @@ try {
     window.log.info('shutdown');
     ipc.send('shutdown');
   };
+
+  window.minimize = () => {
+    window.log.info('minimize');
+    ipc.send('minimize');
+  }
+  window.maximize = () => {
+    window.log.info('maximize');
+    ipc.send('maximize');
+  }
+  window.restore = () => {
+    window.log.info('restore');
+    ipc.send('restore');
+  }
+
+  window.isMaximized = (callback) => {
+    window.log.info('is-maximized');
+    ipc.invoke('is-maximized').then(isMaximized => callback(isMaximized));
+  }
 
   window.closeAbout = () => ipc.send('close-about');
   window.readyForUpdates = () => ipc.send('ready-for-updates');

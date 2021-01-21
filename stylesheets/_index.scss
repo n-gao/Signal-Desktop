@@ -1,6 +1,103 @@
 // Copyright 2015-2020 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 
+.titlebar {
+  display: block;
+  position: fixed;
+  top: 0;
+  height: 32px;
+  width: 100%;
+  background-color: $color-accent-blue;
+  z-index: 100000;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 12px;
+
+  .drag-region {
+    width: 100%;
+    height: 100%;
+    -webkit-app-region: drag;
+  }
+
+  span {
+    font-family: "Segoe UI", sans-serif;
+    font-size: 12px;
+    user-select: none;
+  }
+
+  .window-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 46px);
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    -webkit-app-region: no-drag;
+
+    .button {
+      grid-row: 1 / span 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      user-select: none;
+
+      transition: background-color 0.1s;
+
+      img {
+        pointer-events: none;
+      }
+
+      &:hover {
+        background-color: rgba($color: #000000, $alpha: 0.1);
+      }
+
+      &:active {
+        background-color: rgba($color: #000000, $alpha: 0.15);
+      }
+    }
+
+    .min-button {
+      grid-column: 1;
+    }
+
+    .max-button, .restore-button {
+      grid-column: 2;
+    }
+
+    .restore-button {
+      display: none;
+    }
+
+    .close-button {
+      grid-column: 3;
+
+      &:hover {
+        background-color: #E81123;
+      }
+
+      &:active {
+        background-color: #e4818a;
+      }
+    }
+  }
+}
+
+.maximized {
+  .max-button {
+    display: none !important;
+  }
+
+  .restore-button {
+    display: flex !important;
+  }
+}
+
+body.custom-titlebar {
+  padding-top: 32px;
+}
+
 .conversation-stack,
 .new-conversation,
 .inbox,

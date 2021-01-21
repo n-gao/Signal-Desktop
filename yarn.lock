@@ -5737,6 +5737,18 @@ currently-unhandled@^0.4.1:
   dependencies:
     array-find-index "^1.0.1"
 
+"curve25519-n@https://github.com/scottnonnenberg-signal/node-curve25519.git#3e94f60bc54b2426476520d8d1a0aa835c25f5cc":
+  version "1.5.0"
+  resolved "https://github.com/scottnonnenberg-signal/node-curve25519.git#3e94f60bc54b2426476520d8d1a0aa835c25f5cc"
+  dependencies:
+    bindings "^1.5.0"
+    nan "^2.14.0"
+
+custom-electron-titlebar@^3.2.6:
+  version "3.2.6"
+  resolved "https://registry.yarnpkg.com/custom-electron-titlebar/-/custom-electron-titlebar-3.2.6.tgz#4cd064efa5020954c09732efa8c667a7ee3636e3"
+  integrity sha512-P3ZGEr0eouUHqhdBBXllpuy2bFhfSmp+32HQBPcwzujjIsUhQxQj/nCpJiFa4SUGAEp1ifu/icuZdDKNNX72Tw==
+
 cyclist@~0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-0.2.2.tgz#1b33792e11e914a2fd6d6ed6447464444e5fa640"
