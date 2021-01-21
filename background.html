@@ -30,6 +30,27 @@
   <!--
     When making changes to these templates, be sure to update test/index.html as well
   -->
+  <script type='text/x-tmpl-mustache' id='titlebar'>
+    <div class='drag-region'>
+      <span>
+        {{ application_title }}
+      </span>
+      <div class='window-controls'>
+        <div class='button min-button'>
+          <img class="icon" srcset="images/icons/v2/window-controls/min-w-10.png 1x, images/icons/v2/window-controls/min-w-12.png 1.25x, images/icons/v2/window-controls/min-w-15.png 1.5x, images/icons/v2/window-controls/min-w-15.png 1.75x, images/icons/v2/window-controls/min-w-20.png 2x, images/icons/v2/window-controls/min-w-20.png 2.25x, images/icons/v2/window-controls/min-w-24.png 2.5x, images/icons/v2/window-controls/min-w-30.png 3x, images/icons/v2/window-controls/min-w-30.png 3.5x" draggable="false" />
+        </div>
+        <div class='button max-button'>
+          <img class="icon" srcset="images/icons/v2/window-controls/max-w-10.png 1x, images/icons/v2/window-controls/max-w-12.png 1.25x, images/icons/v2/window-controls/max-w-15.png 1.5x, images/icons/v2/window-controls/max-w-15.png 1.75x, images/icons/v2/window-controls/max-w-20.png 2x, images/icons/v2/window-controls/max-w-20.png 2.25x, images/icons/v2/window-controls/max-w-24.png 2.5x, images/icons/v2/window-controls/max-w-30.png 3x, images/icons/v2/window-controls/max-w-30.png 3.5x" draggable="false" />
+        </div>
+        <div class='button restore-button'>
+          <img class="icon" srcset="images/icons/v2/window-controls/restore-w-10.png 1x, images/icons/v2/window-controls/restore-w-12.png 1.25x, images/icons/v2/window-controls/restore-w-15.png 1.5x, images/icons/v2/window-controls/restore-w-15.png 1.75x, images/icons/v2/window-controls/restore-w-20.png 2x, images/icons/v2/window-controls/restore-w-20.png 2.25x, images/icons/v2/window-controls/restore-w-24.png 2.5x, images/icons/v2/window-controls/restore-w-30.png 3x, images/icons/v2/window-controls/restore-w-30.png 3.5x" draggable="false" />
+        </div>
+        <div class='button close-button'>
+          <img class="icon" srcset="images/icons/v2/window-controls/close-w-10.png 1x, images/icons/v2/window-controls/close-w-12.png 1.25x, images/icons/v2/window-controls/close-w-15.png 1.5x, images/icons/v2/window-controls/close-w-15.png 1.75x, images/icons/v2/window-controls/close-w-20.png 2x, images/icons/v2/window-controls/close-w-20.png 2.25x, images/icons/v2/window-controls/close-w-24.png 2.5x, images/icons/v2/window-controls/close-w-30.png 3x, images/icons/v2/window-controls/close-w-30.png 3.5x" draggable="false" />
+        </div>
+      </div>
+    </div>
+  </script>
 
   <script type='text/x-tmpl-mustache' id='app-loading-screen'>
     <div class='content'>
@@ -368,6 +389,7 @@
   <script type="text/javascript" src="js/views/phone-input-view.js"></script>
   <script type='text/javascript' src='js/views/safety_number_change_dialog_view.js'></script>
   <script type='text/javascript' src='js/views/standalone_registration_view.js'></script>
+  <script type='text/javascript' src='js/views/titlebar_view.js'></script>
   <script type='text/javascript' src='js/views/app_view.js'></script>
   <script type='text/javascript' src='js/views/clear_data_view.js'></script>
 

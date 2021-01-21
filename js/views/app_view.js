@@ -28,6 +28,10 @@
       window.subscribeToSystemThemeChange(() => {
         this.applyTheme();
       });
+      if (window.platform === 'win32') {
+        this.titlebarView = new Whisper.TitlebarView();
+        this.$el.addClass('custom-titlebar');
+      }
     },
     events: {
       openInbox: 'openInbox',
@@ -53,6 +57,9 @@
     },
     openView(view) {
       this.el.innerHTML = '';
+      if (window.platform === 'win32') {
+        this.el.append(this.titlebarView.el);
+      }
       this.el.append(view.el);
       this.delegateEvents();
     },
