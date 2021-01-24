@@ -109,6 +109,10 @@ try {
   window.setMenuBarVisibility = visibility =>
     ipc.send('set-menu-bar-visibility', visibility);
 
+  window.setHardwareMediaKeyState = enabled =>
+    ipc.send('set-hardware-media-key-state', enabled);
+  window.setHardwareMediaKeyState = enabled => {};
+
   window.restart = () => {
     window.log.info('restart');
     ipc.send('restart');
@@ -155,6 +159,9 @@ try {
   installSetter('theme-setting', 'setThemeSetting');
   installGetter('hide-menu-bar', 'getHideMenuBar');
   installSetter('hide-menu-bar', 'setHideMenuBar');
+
+  installGetter('hardware-media-key-setting', 'getHardwareMediaKeySetting');
+  installSetter('hardware-media-key-setting', 'setHardwareMediaKeySetting');
 
   installGetter('notification-setting', 'getNotificationSetting');
   installSetter('notification-setting', 'setNotificationSetting');

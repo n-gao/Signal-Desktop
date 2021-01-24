@@ -114,6 +114,12 @@
           window.setThemeSetting(theme);
         },
       });
+      new CheckboxView({
+        el: this.$('.hardware-media-key-setting'),
+        name: 'hardware-media-key-setting',
+        value: window.initialData.hardwareMediaKeySetting,
+        setFn: window.setHardwareMediaKeySetting
+      });
       if (Settings.isDrawAttentionSupported()) {
         new CheckboxView({
           el: this.$('.draw-attention-setting'),
@@ -254,6 +260,7 @@
         ),
         generalHeader: i18n('general'),
         spellCheckDescription: i18n('spellCheckDescription'),
+        hardwareMediaKeyDescription: i18n('hardwareMediaKeyDescription'),
         spellCheckHidden: spellCheckDirty ? 'false' : 'true',
         spellCheckDisplay: spellCheckDirty ? 'inherit' : 'none',
         spellCheckDirtyText: appStartSpellCheck

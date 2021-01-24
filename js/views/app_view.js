@@ -24,6 +24,7 @@
 
       this.applyTheme();
       this.applyHideMenu();
+      this.applyHardwareMediaKeySetting();
 
       window.subscribeToSystemThemeChange(() => {
         this.applyTheme();
@@ -50,6 +51,10 @@
       const hideMenuBar = storage.get('hide-menu-bar', false);
       window.setAutoHideMenuBar(hideMenuBar);
       window.setMenuBarVisibility(!hideMenuBar);
+    },
+    applyHardwareMediaKeySetting() {
+      const mediaKeySetting = storage.get('hardware-media-key-setting', true);
+      window.setHardwareMediaKeyState(mediaKeySetting);
     },
     openView(view) {
       this.el.innerHTML = '';

@@ -30,6 +30,8 @@ const getInitialData = async () => ({
   themeSetting: await window.getThemeSetting(),
   hideMenuBar: await window.getHideMenuBar(),
 
+  hardwareMediaKeySetting: await window.getHardwareMediaKeySetting(),
+
   notificationSetting: await window.getNotificationSetting(),
   audioNotification: await window.getAudioNotification(),
   notificationDrawAttention: await window.getNotificationDrawAttention(),

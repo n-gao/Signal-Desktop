@@ -61,6 +61,9 @@ window.setSpellCheck = makeSetter('spell-check');
 window.getAlwaysRelayCalls = makeGetter('always-relay-calls');
 window.setAlwaysRelayCalls = makeSetter('always-relay-calls');
 
+window.getHardwareMediaKeySetting = makeGetter('hardware-media-key-setting');
+window.setHardwareMediaKeySetting = makeSetter('hardware-media-key-setting');
+
 window.getNotificationSetting = makeGetter('notification-setting');
 window.setNotificationSetting = makeSetter('notification-setting');
 window.getNotificationDrawAttention = makeGetter('notification-draw-attention');

@@ -1208,6 +1208,11 @@ ipc.on('set-menu-bar-visibility', (event, visibility) => {
   }
 });
 
+ipc.on('set-hardware-media-key-state', (event, enabled) => {
+  app.commandLine.appendSwitch(enabled ? 'enable-features' : 'disable-features',
+   'HardwareMediaKeyHandling,MediaSessionService');
+});
+
 ipc.on('close-about', () => {
   if (aboutWindow) {
     // Exiting child window when on full screen mode (MacOs only) hides the main window
@@ -1280,6 +1285,9 @@ installSettingsGetter('theme-setting');
 installSettingsSetter('theme-setting');
 installSettingsGetter('hide-menu-bar');
 installSettingsSetter('hide-menu-bar');
+
+installSettingsGetter('hardware-media-key-setting');
+installSettingsSetter('hardware-media-key-setting');
 
 installSettingsGetter('notification-setting');
 installSettingsSetter('notification-setting');

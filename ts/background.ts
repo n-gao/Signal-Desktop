@@ -375,6 +375,13 @@ type WhatIsThis = import('./window.d').WhatIsThis;
         window.setMenuBarVisibility(!value);
       },
 
+      getHardwareMediaKeySetting: () =>
+        window.storage.get('hardware-media-key-setting', true),
+      setHardwareMediaKeySetting: (value: WhatIsThis) => {
+        window.storage.put('hardware-media-key-setting', value);
+        window.setHardwareMediaKeySetting(value);
+      },
+        
       getNotificationSetting: () =>
         window.storage.get('notification-setting', 'message'),
       setNotificationSetting: (value: WhatIsThis) =>

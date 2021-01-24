@@ -1334,6 +1334,10 @@
     "message": "Enable spell check of text entered in message composition box",
     "description": "Description of the media permission description"
   },
+  "hardwareMediaKeyDescription": {
+    "message": "Enable using media keys to control the active media session",
+    "description": "Description of the hardware media key setting"
+  },
   "spellCheckWillBeEnabled": {
     "message": "Spell check will be enabled the next time Signal starts.",
     "description": "Shown when the user enables spellcheck to indicate that they must restart Signal."

@@ -161,6 +161,7 @@ declare global {
     setAutoHideMenuBar: (value: WhatIsThis) => void;
     setBadgeCount: (count: number) => void;
     setMenuBarVisibility: (value: WhatIsThis) => void;
+    setHardwareMediaKeySetting: (value: WhatIsThis) => void;
     showKeyboardShortcuts: () => void;
     storage: {
       addBlockedGroup: (group: string) => void;
