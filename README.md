@@ -7,7 +7,7 @@ This is a fork of the original Signal Desktop app which intends to provide a bet
 
 ## Changes
 A picture is worth a thousand words:
-|    |  Old | New |
+|    |  New | Old |
 | ---| ---- | ---|
 | UI |![New User Interface](images/github/screenshot.png)|![Old User Interface](images/github/screenshot_old.png)|
 | Animations | ![New animations](images/github/demo_retouched.gif) |![Old animations](images/github/demo_old.gif)|
