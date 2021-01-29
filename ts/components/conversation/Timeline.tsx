@@ -1147,14 +1147,13 @@ export class Timeline extends React.PureComponent<PropsType, StateType> {
             );
           }}
         </AutoSizer>
-        {shouldShowScrollDownButton ? (
-          <ScrollDownButton
-            conversationId={id}
-            withNewMessages={areUnreadBelowCurrentPosition}
-            scrollDown={this.onClickScrollDownButton}
-            i18n={i18n}
-          />
-        ) : null}
+        <ScrollDownButton
+          conversationId={id}
+          withNewMessages={areUnreadBelowCurrentPosition}
+          scrollDown={this.onClickScrollDownButton}
+          i18n={i18n}
+          collapse={!shouldShowScrollDownButton}
+        />
       </div>
     );
   }

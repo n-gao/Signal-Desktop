@@ -140,6 +140,9 @@
   .module-quote {
     margin: 0;
 
+    @include foldopen-animation;
+    @include foldclose-animation;
+
     border-left-style: none;
     @include ios-dark-theme {
       background-color: $ultramarine-brand-dark;
@@ -318,6 +321,7 @@
     }
 
     @include popper-shadow;
+    @include fadein-animation;
 
     .buttons {
       margin-top: 16px;
