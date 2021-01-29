@@ -22,11 +22,11 @@
 
     @include light-theme {
       background-color: $color-white;
-      box-shadow: 0px 3px 5px 0px $color-black-alpha-20;
     }
     @include dark-theme {
       background-color: $color-gray-95;
-      box-shadow: 0px 3px 5px 0px $color-white-alpha-20;
     }
+
+    @include popper-shadow;
   }
 }

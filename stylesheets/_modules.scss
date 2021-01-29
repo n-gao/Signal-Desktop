@@ -7942,7 +7942,7 @@ button.module-image__border-overlay:focus {
   &__container {
     position: relative;
     border-radius: 8px;
-    box-shadow: 0 4px 12px 0 $color-black-alpha-20;
+    @include popper-shadow;
     width: 440px;
     height: 360px;
     overflow: hidden;
