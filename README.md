@@ -1,7 +1,23 @@
 <!-- Copyright 2014-2020 Signal Messenger, LLC -->
 <!-- SPDX-License-Identifier: AGPL-3.0-only -->
 
-# Signal Desktop
+# Signal Desktop Retouched
+
+This is a fork of the original Signal Desktop app which intends to provide a better and more modern user-interface. The original readme file is listed below. Note that the installation is **different**.
+
+## Installation
+### Binaries
+The [release page](https://github.com/n-gao/Signal-Desktop-Retouched/releases) contains binaries for Windows. Since, I am solely using this client on Windows. If you are interested in other operating systems you have to building it [from source](#from-source).
+### From source
+To build it from source please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+
+## Drawbacks
+Since this is not the official Signal client there are a number of compromises you have to deal with if you want to use this.
+* Auto update is not available as it would override all changes to the default client
+* You have to trust me that I know what I am doing
+
+
+# Signal Desktop (original)
 
 Signal Desktop is an Electron application that links with Signal
 on [Android](https://github.com/signalapp/Signal-Android)
