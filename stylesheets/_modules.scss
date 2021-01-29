@@ -7072,7 +7072,9 @@ button.module-image__border-overlay:focus {
 
       .module-quote, 
       .module-image--curved-top-right, 
-      .module-message__attachment-container {
+      .module-message__attachment-container,
+      .module-message__link-preview,
+      .module-message__link-preview__content {
         border-top-right-radius: 4px;
       }
     }
@@ -7082,7 +7084,9 @@ button.module-image__border-overlay:focus {
 
       .module-quote, 
       .module-image--curved-top-left, 
-      .module-message__attachment-container {
+      .module-message__attachment-container,
+      .module-message__link-preview,
+      .module-message__link-preview__content {
         border-top-left-radius: 4px;
       }
     }
