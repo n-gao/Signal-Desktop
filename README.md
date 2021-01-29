@@ -5,6 +5,27 @@
 
 This is a fork of the original Signal Desktop app which intends to provide a better and more modern user-interface. The original readme file is listed below. Note that the installation is **different**.
 
+## Changes
+A picture is worth a thousand words:
+|    |  Old | New |
+| ---| ---- | ---|
+| UI |![New User Interface](images/github/screenshot.png)|![Old User Interface](images/github/screenshot_old.png)|
+| Animations | ![New animations](images/github/demo_retouched.gif) |![Old animations](images/github/demo_old.gif)|
+
+But if you prefer words, here is a non-complete list of changes:
+* Added [background image](https://pixabay.com/illustrations/seamless-pattern-kids-cosmonaut-5916873/)
+* Increased header size
+* Improved conversation view (messages are grouped by author)
+* Animations for most popups
+* Improved search consistency
+* Color updates
+* Delimiter in conversation list
+* Updated scroll down button
+* Properly centered avatars in search results
+* Updated font size in avatars to align with mobile versions
+* And a lot of tiny tweaks!
+
+
 ## Installation
 ### Binaries
 The [release page](https://github.com/n-gao/Signal-Desktop-Retouched/releases) contains binaries for Windows. Since, I am solely using this client on Windows. If you are interested in other operating systems you have to building it [from source](#from-source).
