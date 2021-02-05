@@ -596,21 +596,24 @@ export class Timeline extends React.PureComponent<PropsType, StateType> {
         );
       }
       const messageId = items[itemIndex];
-      const conversation = window.getConversations().get(this.props.id);
+      const conversation = window.getConversations().get(id);
       const messages = conversation.messageCollection?.models;
 
       let beforeSame = false;
       let afterSame = false;
 
       if (messages) {
-        const messageIdx = messages.findIndex((msg) => msg.id == messageId);
+        const messageIdx = messages.findIndex(msg => msg.id === messageId);
         const msg = messages[messageIdx];
-  
-        function fromSameAuthor(msg1: MessageModel, msg2: MessageModel) {
-          return msg1 && msg1.attributes && msg2 && msg2.attributes && 
-            (msg1.attributes.sourceUuid == msg2.attributes.sourceUuid ||
-             msg1.attributes.type == 'outgoing' && msg2.attributes.type == 'outgoing');
-        }
+
+        const fromSameAuthor = (msg1: MessageModel, msg2: MessageModel) =>
+          msg1 &&
+          msg1.attributes &&
+          msg2 &&
+          msg2.attributes &&
+          (msg1.attributes.sourceUuid === msg2.attributes.sourceUuid ||
+            (msg1.attributes.type === 'outgoing' &&
+              msg2.attributes.type === 'outgoing'));
 
         beforeSame = fromSameAuthor(messages[messageIdx - 1], msg);
         afterSame = fromSameAuthor(messages[messageIdx + 1], msg);
@@ -622,8 +625,12 @@ export class Timeline extends React.PureComponent<PropsType, StateType> {
           data-row={row}
           className={classNames(
             'module-timeline__message-container',
-            beforeSame ? 'module-timeline__message-container--same-author-before' : null,
-            afterSame ? 'module-timeline__message-container--same-author-after' : null
+            beforeSame
+              ? 'module-timeline__message-container--same-author-before'
+              : null,
+            afterSame
+              ? 'module-timeline__message-container--same-author-after'
+              : null
           )}
           style={styleWithWidth}
           role="row"
