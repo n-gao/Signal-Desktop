@@ -5011,7 +5011,9 @@ button.module-conversation-details__action-button {
     &__cancel-icon {
       position: absolute;
       right: 8px;
-      top: 5px;
+      top: 50%;
+      bottom: 50%;
+      transform: translateY(-50%);
       height: 18px;
       width: 18px;
 
