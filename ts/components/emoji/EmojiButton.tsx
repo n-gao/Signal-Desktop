@@ -11,6 +11,7 @@ import { LocalizerType } from '../../types/Util';
 
 export type OwnProps = {
   readonly i18n: LocalizerType;
+  readonly onClose?: () => unknown;
 };
 
 export type Props = OwnProps &
@@ -29,6 +30,7 @@ export const EmojiButton = React.memo(
   ({
     i18n,
     doSend,
+    onClose,
     onPickEmoji,
     skinTone,
     onSetSkinTone,
@@ -40,16 +42,17 @@ export const EmojiButton = React.memo(
     const [popperRoot, setPopperRoot] = React.useState<HTMLElement | null>(
       null
     );
+    const isVisible = openState !== OpenState.HIDDEN;
 
     const hide = React.useCallback(() => {
-      if (openState !== OpenState.VISIBLE) {
+      if (!isVisible) {
         return;
       }
       setOpenState(OpenState.FADEOUT);
       setTimeout(() => {
         setOpenState(OpenState.HIDDEN);
       }, 200);
-    }, [openState, popperRoot, setOpenState]);
+    }, [isVisible, setOpenState]);
 
     const handleClickButton = React.useCallback(() => {
       if (popperRoot) {
@@ -57,21 +60,27 @@ export const EmojiButton = React.memo(
       } else {
         setOpenState(OpenState.VISIBLE);
       }
-    }, [popperRoot, setOpenState]);
+    }, [popperRoot, setOpenState, hide]);
 
     const handleClose = React.useCallback(() => {
       hide();
-    }, [setOpenState]);
+      if (onClose) {
+        onClose();
+      }
+    }, [hide, onClose]);
 
     // Create popper root and handle outside clicks
     React.useEffect(() => {
-      if (openState === OpenState.VISIBLE) {
+      if (isVisible) {
         const root = document.createElement('div');
         setPopperRoot(root);
         document.body.appendChild(root);
-        const handleOutsideClick = ({ target }: MouseEvent) => {
-          if (!root.contains(target as Node)) {
+        const handleOutsideClick = (event: MouseEvent) => {
+          if (!root.contains(event.target as Node)) {
             hide();
+            handleClose();
+            event.stopPropagation();
+            event.preventDefault();
           }
         };
         document.addEventListener('click', handleOutsideClick);
@@ -84,7 +93,7 @@ export const EmojiButton = React.memo(
       }
 
       return noop;
-    }, [openState !== OpenState.HIDDEN, setOpenState, setPopperRoot]);
+    }, [hide, setPopperRoot, isVisible, handleClose]);
 
     // Install keyboard shortcut to open emoji picker
     React.useEffect(() => {
@@ -104,7 +113,7 @@ export const EmojiButton = React.memo(
           event.stopPropagation();
           event.preventDefault();
 
-          if (openState === OpenState.HIDDEN) {
+          if (isVisible) {
             setOpenState(OpenState.VISIBLE);
           } else {
             hide();
@@ -116,7 +125,7 @@ export const EmojiButton = React.memo(
       return () => {
         document.removeEventListener('keydown', handleKeydown);
       };
-    }, [openState !== OpenState.HIDDEN, setOpenState]);
+    }, [isVisible, setOpenState, hide]);
 
     return (
       <Manager>

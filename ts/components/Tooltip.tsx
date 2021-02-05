@@ -7,10 +7,10 @@ import { noop } from 'lodash';
 import { Manager, Reference, Popper } from 'react-popper';
 import { Theme, themeClassName } from '../util/theme';
 
-interface EventWrapperPropsType {
+type EventWrapperPropsType = {
   children: React.ReactNode;
   onHoverChanged: (_: boolean) => void;
-}
+};
 
 // React doesn't reliably fire `onMouseLeave` or `onMouseOut` events if wrapping a
 //   disabled button. This uses native browser events to avoid that.
@@ -104,7 +104,7 @@ export const Tooltip: React.FC<PropsType> = ({
     Visibility.HIDDEN
   );
 
-  const showTooltip = Boolean(sticky) ? Visibility.VISIBLE : visibility;
+  const showTooltip = sticky ? Visibility.VISIBLE : visibility;
 
   const tooltipThemeClassName = theme
     ? `module-tooltip--${themeClassName(theme)}`
@@ -136,9 +136,12 @@ export const Tooltip: React.FC<PropsType> = ({
           setVisibility(Visibility.VISIBLE);
           break;
         }
+        default: {
+          break;
+        }
       }
     },
-    [visibility, setVisibility]
+    [visibility, setVisibility, hideIfFading]
   );
 
   return (

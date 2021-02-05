@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import React, { ReactPortal } from 'react';
+import classNames from 'classnames';
 import { createPortal } from 'react-dom';
 
 import { ConversationType } from '../../state/ducks/conversations';
+import { About } from './About';
 import { Avatar } from '../Avatar';
 import { LocalizerType } from '../../types/Util';
 
@@ -12,22 +14,26 @@ export type PropsType = {
   areWeAdmin: boolean;
   contact?: ConversationType;
   readonly i18n: LocalizerType;
+  isAdmin: boolean;
   isMember: boolean;
   onClose: () => void;
   openConversation: (conversationId: string) => void;
   removeMember: (conversationId: string) => void;
   showSafetyNumber: (conversationId: string) => void;
+  toggleAdmin: (conversationId: string) => void;
 };
 
 export const ContactModal = ({
   areWeAdmin,
   contact,
   i18n,
+  isAdmin,
   isMember,
   onClose,
   openConversation,
   removeMember,
   showSafetyNumber,
+  toggleAdmin,
 }: PropsType): ReactPortal | null => {
   if (!contact) {
     throw new Error('Contact modal opened without a matching contact');
@@ -36,6 +42,16 @@ export const ContactModal = ({
   const [root, setRoot] = React.useState<HTMLElement | null>(null);
   const overlayRef = React.useRef<HTMLElement | null>(null);
   const closeButtonRef = React.useRef<HTMLElement | null>(null);
+  const [fadeout, setFadeout] = React.useState(false);
+
+  const close = React.useCallback(() => {
+    if (!fadeout) {
+      setFadeout(true);
+      setTimeout(() => {
+        onClose();
+      }, 200);
+    }
+  }, [fadeout, setFadeout, onClose]);
 
   React.useEffect(() => {
     const div = document.createElement('div');
@@ -60,7 +76,7 @@ export const ContactModal = ({
         event.preventDefault();
         event.stopPropagation();
 
-        onClose();
+        close();
       }
     };
     document.addEventListener('keyup', handler);
@@ -68,14 +84,14 @@ export const ContactModal = ({
     return () => {
       document.removeEventListener('keyup', handler);
     };
-  }, [onClose]);
+  }, [close]);
 
   const onClickOverlay = (e: React.MouseEvent<HTMLElement>) => {
     if (e.target === overlayRef.current) {
       e.preventDefault();
       e.stopPropagation();
 
-      onClose();
+      close();
     }
   };
 
@@ -86,7 +102,10 @@ export const ContactModal = ({
             overlayRef.current = ref;
           }}
           role="presentation"
-          className="module-contact-modal__overlay"
+          className={classNames(
+            'module-contact-modal__overlay',
+            fadeout ? 'fadeout' : null
+          )}
           onClick={onClickOverlay}
         >
           <div className="module-contact-modal">
@@ -96,7 +115,7 @@ export const ContactModal = ({
               }}
               type="button"
               className="module-contact-modal__close-button"
-              onClick={onClose}
+              onClick={close}
               aria-label={i18n('close')}
             />
             <Avatar
@@ -110,6 +129,9 @@ export const ContactModal = ({
               title={contact.title}
             />
             <div className="module-contact-modal__name">{contact.title}</div>
+            <div className="module-about__container">
+              <About text={contact.about} />
+            </div>
             {contact.phoneNumber && (
               <div className="module-contact-modal__profile-and-number">
                 {contact.phoneNumber}
@@ -139,16 +161,32 @@ export const ContactModal = ({
                 </button>
               )}
               {!contact.isMe && areWeAdmin && isMember && (
-                <button
-                  type="button"
-                  className="module-contact-modal__button module-contact-modal__remove-from-group"
-                  onClick={() => removeMember(contact.id)}
-                >
-                  <div className="module-contact-modal__bubble-icon">
-                    <div className="module-contact-modal__remove-from-group__bubble-icon" />
-                  </div>
-                  <span>{i18n('ContactModal--remove-from-group')}</span>
-                </button>
+                <>
+                  <button
+                    type="button"
+                    className="module-contact-modal__button module-contact-modal__make-admin"
+                    onClick={() => toggleAdmin(contact.id)}
+                  >
+                    <div className="module-contact-modal__bubble-icon">
+                      <div className="module-contact-modal__make-admin__bubble-icon" />
+                    </div>
+                    {isAdmin ? (
+                      <span>{i18n('ContactModal--rm-admin')}</span>
+                    ) : (
+                      <span>{i18n('ContactModal--make-admin')}</span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="module-contact-modal__button module-contact-modal__remove-from-group"
+                    onClick={() => removeMember(contact.id)}
+                  >
+                    <div className="module-contact-modal__bubble-icon">
+                      <div className="module-contact-modal__remove-from-group__bubble-icon" />
+                    </div>
+                    <span>{i18n('ContactModal--remove-from-group')}</span>
+                  </button>
+                </>
               )}
             </div>
           </div>
