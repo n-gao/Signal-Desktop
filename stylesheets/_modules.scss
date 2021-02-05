@@ -10202,17 +10202,14 @@ button.module-image__border-overlay:focus {
     &:hover {
       background-color: $color-gray-02;
     }
-
-    box-shadow: 0px 3px 5px 0px $color-black-alpha-20;
   }
   @include dark-theme {
     background-color: $color-gray-80;
     &:hover {
       background-color: $color-gray-75;
     }
-
-    box-shadow: 0px 3px 5px 0px $color-black-alpha-20;
   }
+  box-shadow: 0px 5px 7px 0px $color-black-alpha-40;
 }
 
 .module-scroll-down__button--new-messages {
