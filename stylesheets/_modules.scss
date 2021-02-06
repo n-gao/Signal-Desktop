@@ -121,7 +121,7 @@
   flex-direction: row;
   align-items: center;
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity 0.10s;
 }
 
 .module-message:hover .module-message__buttons {
@@ -11862,6 +11862,7 @@ $contact-modal-padding: 18px;
 /* Lightbox */
 .module-lightbox {
   @include fadein-animation;
+  @include fadeout-animation;
 }
 
 /* Spec: container > 438px and container < 593px */
