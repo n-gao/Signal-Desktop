@@ -25,6 +25,9 @@ But if you prefer words, here is a non-complete list of changes:
 * Updated font size in avatars to align with mobile versions
 * And a lot of tiny tweaks!
 
+Non-visual tweaks:
+* The textbox automatically get the focus if you start typing
+
 
 ## Installation
 ### Binaries
