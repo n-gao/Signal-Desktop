@@ -1,0 +1,62 @@
+# This is a basic workflow to help you get started with Actions
+
+name: publish-on-tag
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - run: systeminfo
+      - run: git config --global core.autocrlf false
+      - run: git config --global core.eol lf
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12.18.3'
+      - run: npm install -g yarn@1.22.0
+      - run: yarn install --frozen-lockfile
+      - run: yarn generate
+      - run: node build\grunt.js
+      - run: yarn test-node
+      - run: copy package.json temp.json
+      - run: del package.json
+      - run: type temp.json | findstr /v certificateSubjectName | findstr /v certificateSha1 > package.json
+      - run: yarn prepare-beta-build
+      - run: yarn build
+      - run: node build\grunt.js test
+      - run: node build\grunt.js test-release:win
+      - name: Zip binaries
+        run: powershell.exe -c "Create-Archive release/win-unpacked/ win-unpacked.zip"
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+      - name: Upload Binaries
+        id: upload_binaries
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./win-unpacked.zip
+          asset_name: win-unpacked.zip
+          asset_content_type: application/zip
