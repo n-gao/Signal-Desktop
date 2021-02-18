@@ -38,7 +38,8 @@ jobs:
       - run: node build\grunt.js test
       - run: node build\grunt.js test-release:win
       - name: Zip binaries
-        run: powershell.exe -c "Create-Archive release/win-unpacked/ win-unpacked.zip"
+        shell: pwsh
+        run: Create-Archive release/win-unpacked/ win-unpacked.zip
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1.0.0
