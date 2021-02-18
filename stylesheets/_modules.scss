@@ -2143,7 +2143,6 @@ $timer-icons: '55', '50', '45', '40', '35', '30', '25', '20', '15', '10', '05',
     -webkit-line-clamp: 2;
     display: -webkit-box;
     overflow: hidden;
-    text-align: left;
     text-overflow: ellipsis;
 
     img.emoji {
@@ -3081,10 +3080,16 @@ $timer-icons: '55', '50', '45', '40', '35', '30', '25', '20', '15', '10', '05',
   }
 
   @include light-theme {
-    @include color-svg('../images/icons/v2/more-horiz-24.svg', $color-gray-75);
+    @include color-svg(
+      '../images/icons/v2/chevron-down-24.svg',
+      $color-gray-75
+    );
   }
   @include dark-theme {
-    @include color-svg('../images/icons/v2/more-horiz-24.svg', $color-gray-15);
+    @include color-svg(
+      '../images/icons/v2/chevron-down-24.svg',
+      $color-gray-15
+    );
   }
 }
 
@@ -5046,10 +5051,16 @@ button.module-conversation-details__action-button {
     align-items: center;
     display: flex;
     justify-content: center;
-    background-color: $color-gray-75;
     border-radius: 48px;
     height: 48px;
     width: 48px;
+
+    @include light-theme {
+      background-color: $color-gray-65;
+    }
+    @include dark-theme {
+      background-color: $color-gray-75;
+    }
 
     &:after {
       content: '';
@@ -6628,6 +6639,7 @@ button.module-image__border-overlay:focus {
   background-color: $color-gray-75;
   display: flex;
   justify-content: space-between;
+  padding-top: var(--title-bar-drag-area-height);
 }
 
 .module-incoming-call__contact {

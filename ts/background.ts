@@ -326,7 +326,7 @@ type WhatIsThis = import('./window.d').WhatIsThis;
     window.Events = {
       getDeviceName: () => window.textsecure.storage.user.getDeviceName(),
 
-      getThemeSetting: () =>
+      getThemeSetting: (): 'light' | 'dark' | 'system' =>
         window.storage.get(
           'theme-setting',
           window.platform === 'darwin' ? 'system' : 'light'
@@ -733,6 +733,8 @@ type WhatIsThis = import('./window.d').WhatIsThis;
         selectedConversation: undefined,
         selectedMessage: undefined,
         selectedMessageCounter: 0,
+        selectedConversationPanelDepth: 0,
+        selectedConversationTitle: '',
         showArchived: false,
       },
       emojis: window.Signal.Emojis.getInitialState(),
@@ -749,6 +751,7 @@ type WhatIsThis = import('./window.d').WhatIsThis;
         platform: window.platform,
         i18n: window.i18n,
         interactionMode: window.getInteractionMode(),
+        theme: window.Events.getThemeSetting(),
       },
     };
 
@@ -978,9 +981,7 @@ type WhatIsThis = import('./window.d').WhatIsThis;
           document.querySelector('.module-main-header__search__input'),
           document.querySelector('.module-left-pane__list'),
           document.querySelector('.module-search-results'),
-          document.querySelector(
-            '.module-composition-area .public-DraftEditor-content'
-          ),
+          document.querySelector('.module-composition-area .ql-editor'),
         ];
         const focusedIndex = targets.findIndex(target => {
           if (!target || !focusedElement) {
@@ -2159,6 +2160,13 @@ type WhatIsThis = import('./window.d').WhatIsThis;
     const view = window.owsDesktopApp.appView;
     if (view) {
       view.applyTheme();
+    }
+
+    if (window.reduxActions && window.reduxActions.user) {
+      const theme = window.Events.getThemeSetting();
+      window.reduxActions.user.userChanged({
+        theme: theme === 'system' ? window.systemTheme : theme,
+      });
     }
   }
 

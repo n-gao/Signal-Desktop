@@ -358,6 +358,8 @@ declare global {
           isImage: typeof Attachment.isImage;
           isVideo: typeof Attachment.isVideo;
           isAudio: typeof Attachment.isAudio;
+
+          getUploadSizeLimitKb: typeof Attachment.getUploadSizeLimitKb;
         };
         MIME: typeof MIME;
         Contact: typeof Contact;
@@ -557,7 +559,10 @@ export class CertificateValidatorType {
 }
 
 export class SecretSessionCipherClass {
-  constructor(storage: StorageType);
+  constructor(
+    storage: StorageType,
+    options?: { messageKeysLimit?: number | boolean }
+  );
   decrypt: (
     validator: CertificateValidatorType,
     ciphertext: ArrayBuffer,

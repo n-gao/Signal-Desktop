@@ -12,16 +12,18 @@ type GroupV2PendingMemberType = import('../model-types.d').GroupV2PendingMemberT
 type MediaItemType = import('../components/LightboxGallery').MediaItemType;
 type MessageType = import('../state/ducks/conversations').MessageType;
 
+type GetLinkPreviewImageResult = {
+  data: ArrayBuffer;
+  size: number;
+  contentType: string;
+  width?: number;
+  height?: number;
+};
+
 type GetLinkPreviewResult = {
   title: string;
   url: string;
-  image: {
-    data: ArrayBuffer;
-    size: number;
-    contentType: string;
-    width: number;
-    height: number;
-  };
+  image?: GetLinkPreviewImageResult;
   description: string | null;
   date: number | null;
 };
@@ -1693,29 +1695,9 @@ Whisper.ConversationView = Whisper.View.extend({
   },
 
   isSizeOkay(attachment: any) {
-    let limitKb = 1000000;
-    const type =
-      attachment.contentType === 'image/gif'
-        ? 'gif'
-        : attachment.contentType.split('/')[0];
-
-    switch (type) {
-      case 'image':
-        limitKb = 6000;
-        break;
-      case 'gif':
-        limitKb = 25000;
-        break;
-      case 'audio':
-        limitKb = 100000;
-        break;
-      case 'video':
-        limitKb = 100000;
-        break;
-      default:
-        limitKb = 100000;
-        break;
-    }
+    const limitKb = window.Signal.Types.Attachment.getUploadSizeLimitKb(
+      attachment.contentType
+    );
     // this needs to be cast properly
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -3583,7 +3565,10 @@ Whisper.ConversationView = Whisper.View.extend({
     this.renderLinkPreview();
   },
 
-  async getStickerPackPreview(url: any) {
+  async getStickerPackPreview(
+    url: string,
+    abortSignal: any
+  ): Promise<null | GetLinkPreviewResult> {
     const isPackDownloaded = (pack: any) =>
       pack && (pack.status === 'downloaded' || pack.status === 'installed');
     const isPackValid = (pack: any) =>
@@ -3607,7 +3592,12 @@ Whisper.ConversationView = Whisper.View.extend({
         await window.Signal.Stickers.downloadEphemeralPack(id, keyBase64);
       }
 
+      if (abortSignal.aborted) {
+        return null;
+      }
+
       const pack = window.Signal.Stickers.getStickerPack(id);
+
       if (!isPackValid(pack)) {
         return null;
       }
@@ -3622,6 +3612,10 @@ Whisper.ConversationView = Whisper.View.extend({
           ? await window.Signal.Migrations.readTempData(sticker.path)
           : await window.Signal.Migrations.readStickerData(sticker.path);
 
+      if (abortSignal.aborted) {
+        return null;
+      }
+
       return {
         title,
         url,
@@ -3631,6 +3625,8 @@ Whisper.ConversationView = Whisper.View.extend({
           size: data.byteLength,
           contentType: 'image/webp',
         },
+        description: null,
+        date: null,
       };
     } catch (error) {
       window.log.error(
@@ -3645,12 +3641,99 @@ Whisper.ConversationView = Whisper.View.extend({
     }
   },
 
+  async getGroupPreview(
+    url: string,
+    abortSignal: any
+  ): Promise<null | GetLinkPreviewResult> {
+    let urlObject;
+    try {
+      urlObject = new URL(url);
+    } catch (err) {
+      return null;
+    }
+
+    const { hash } = urlObject;
+    if (!hash) {
+      return null;
+    }
+    const groupData = hash.slice(1);
+
+    const {
+      inviteLinkPassword,
+      masterKey,
+    } = window.Signal.Groups.parseGroupLink(groupData);
+
+    const fields = window.Signal.Groups.deriveGroupFields(
+      window.Signal.Crypto.base64ToArrayBuffer(masterKey)
+    );
+    const id = window.Signal.Crypto.arrayBufferToBase64(fields.id);
+    const logId = `groupv2(${id})`;
+    const secretParams = window.Signal.Crypto.arrayBufferToBase64(
+      fields.secretParams
+    );
+
+    window.log.info(`getGroupPreview/${logId}: Fetching pre-join state`);
+    const result = await window.Signal.Groups.getPreJoinGroupInfo(
+      inviteLinkPassword,
+      masterKey
+    );
+
+    if (abortSignal.aborted) {
+      return null;
+    }
+
+    const title =
+      window.Signal.Groups.decryptGroupTitle(result.title, secretParams) ||
+      window.i18n('unknownGroup');
+    const description =
+      result.memberCount === 1 || result.memberCount === undefined
+        ? window.i18n('GroupV2--join--member-count--single')
+        : window.i18n('GroupV2--join--member-count--multiple', {
+            count: result.memberCount.toString(),
+          });
+    let image: undefined | GetLinkPreviewImageResult;
+
+    if (result.avatar) {
+      try {
+        const data = await window.Signal.Groups.decryptGroupAvatar(
+          result.avatar,
+          secretParams
+        );
+        image = {
+          data,
+          size: data.byteLength,
+          contentType: 'image/jpeg',
+        };
+      } catch (error) {
+        const errorString = error && error.stack ? error.stack : error;
+        window.log.error(
+          `getGroupPreview/${logId}: Failed to fetch avatar ${errorString}`
+        );
+      }
+    }
+
+    if (abortSignal.aborted) {
+      return null;
+    }
+
+    return {
+      title,
+      description,
+      url,
+      image,
+      date: null,
+    };
+  },
+
   async getPreview(
     url: string,
     abortSignal: any
   ): Promise<null | GetLinkPreviewResult> {
     if (window.Signal.LinkPreviews.isStickerPack(url)) {
-      return this.getStickerPackPreview(url);
+      return this.getStickerPackPreview(url, abortSignal);
+    }
+    if (window.Signal.LinkPreviews.isGroupLink(url)) {
+      return this.getGroupPreview(url, abortSignal);
     }
 
     // This is already checked elsewhere, but we want to be extra-careful.

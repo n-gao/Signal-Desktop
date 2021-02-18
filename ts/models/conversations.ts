@@ -1412,9 +1412,9 @@ export class ConversationModel extends window.Backbone.Model<
     window.Signal.Data.updateConversation(this.attributes);
   }
 
-  getMembersCount(): number {
+  getMembersCount(): number | undefined {
     if (this.isPrivate()) {
-      return 1;
+      return undefined;
     }
 
     const memberList = this.get('membersV2') || this.get('members');
@@ -1429,7 +1429,7 @@ export class ConversationModel extends window.Backbone.Model<
       return temporaryMemberCount;
     }
 
-    return 0;
+    return undefined;
   }
 
   decrementMessageCount(): void {
@@ -4023,6 +4023,12 @@ export class ConversationModel extends window.Backbone.Model<
   async leaveGroup(): Promise<void> {
     const now = Date.now();
     if (this.get('type') === 'group') {
+      const groupId = this.get('groupId');
+
+      if (!groupId) {
+        throw new Error(`leaveGroup/${this.idForLogging()}: No groupId!`);
+      }
+
       const groupIdentifiers = this.getRecipients();
       this.set({ left: true });
       window.Signal.Data.updateConversation(this.attributes);
@@ -4048,7 +4054,7 @@ export class ConversationModel extends window.Backbone.Model<
       message.send(
         this.wrapSend(
           window.textsecure.messaging.leaveGroup(
-            this.id,
+            groupId,
             groupIdentifiers,
             options
           )

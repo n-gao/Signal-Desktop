@@ -170,7 +170,7 @@ export function isVideoAttachment(
 }
 
 export function hasNotDownloaded(attachment?: AttachmentType): boolean {
-  return Boolean(attachment && !attachment.url && attachment.blurHash);
+  return Boolean(attachment && !attachment.url);
 }
 
 export function hasVideoBlurHash(attachments?: Array<AttachmentType>): boolean {
@@ -430,4 +430,14 @@ export const getFileExtension = (
     default:
       return attachment.contentType.split('/')[1];
   }
+};
+
+export const getUploadSizeLimitKb = (contentType: MIME.MIMEType): number => {
+  if (MIME.isGif(contentType)) {
+    return 25000;
+  }
+  if (isImageTypeSupported(contentType)) {
+    return 6000;
+  }
+  return 100000;
 };

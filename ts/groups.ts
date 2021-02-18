@@ -2648,7 +2648,7 @@ async function integrateGroupChanges({
 
       const { groupChange, groupState } = changeState;
 
-      if (!groupChange || !groupState) {
+      if (!groupChange && !groupState) {
         window.log.warn(
           'integrateGroupChanges: item had neither groupState nor groupChange. Skipping.'
         );
@@ -2721,7 +2721,7 @@ async function integrateGroupChange({
   newRevision,
 }: {
   group: ConversationAttributesType;
-  groupChange: GroupChangeClass;
+  groupChange?: GroupChangeClass;
   groupState?: GroupClass;
   newRevision: number;
 }): Promise<UpdatesResultType> {
@@ -2732,46 +2732,67 @@ async function integrateGroupChange({
     );
   }
 
-  const groupChangeActions = window.textsecure.protobuf.GroupChange.Actions.decode(
-    groupChange.actions.toArrayBuffer()
-  );
-
-  if (groupChangeActions.version && groupChangeActions.version > newRevision) {
-    return {
-      newAttributes: group,
-      groupChangeMessages: [],
-      members: [],
-    };
+  if (!groupChange && !groupState) {
+    throw new Error(
+      `integrateGroupChange/${logId}: Neither groupChange nor groupState received!`
+    );
   }
 
-  const decryptedChangeActions = decryptGroupChange(
-    groupChangeActions,
-    group.secretParams,
-    logId
-  );
-
-  const { sourceUuid } = decryptedChangeActions;
-  const sourceConversation = window.ConversationController.getOrCreate(
-    sourceUuid,
-    'private'
-  );
-  const sourceConversationId = sourceConversation.id;
-
-  const isChangeSupported =
-    !isNumber(groupChange.changeEpoch) ||
-    groupChange.changeEpoch <= SUPPORTED_CHANGE_EPOCH;
   const isFirstFetch = !isNumber(group.revision);
-  const isMoreThanOneVersionUp =
-    groupChangeActions.version &&
-    isNumber(group.revision) &&
-    groupChangeActions.version > group.revision + 1;
-
   const ourConversationId = window.ConversationController.getOurConversationIdOrThrow();
   const weAreAwaitingApproval = (group.pendingAdminApprovalV2 || []).find(
     item => item.conversationId === ourConversationId
   );
 
+  // These need to be populated from the groupChange. But we might not get one!
+  let isChangeSupported = false;
+  let isMoreThanOneVersionUp = false;
+  let groupChangeActions: undefined | GroupChangeClass.Actions;
+  let decryptedChangeActions: undefined | GroupChangeClass.Actions;
+  let sourceConversationId: undefined | string;
+
+  if (groupChange) {
+    groupChangeActions = window.textsecure.protobuf.GroupChange.Actions.decode(
+      groupChange.actions.toArrayBuffer()
+    );
+
+    if (
+      groupChangeActions.version &&
+      groupChangeActions.version > newRevision
+    ) {
+      return {
+        newAttributes: group,
+        groupChangeMessages: [],
+        members: [],
+      };
+    }
+
+    decryptedChangeActions = decryptGroupChange(
+      groupChangeActions,
+      group.secretParams,
+      logId
+    );
+
+    const { sourceUuid } = decryptedChangeActions;
+    const sourceConversation = window.ConversationController.getOrCreate(
+      sourceUuid,
+      'private'
+    );
+    sourceConversationId = sourceConversation.id;
+
+    isChangeSupported =
+      !isNumber(groupChange.changeEpoch) ||
+      groupChange.changeEpoch <= SUPPORTED_CHANGE_EPOCH;
+
+    isMoreThanOneVersionUp = Boolean(
+      groupChangeActions.version &&
+        isNumber(group.revision) &&
+        groupChangeActions.version > group.revision + 1
+    );
+  }
+
   if (
+    !groupChange ||
     !isChangeSupported ||
     isFirstFetch ||
     (isMoreThanOneVersionUp && !weAreAwaitingApproval)
@@ -2785,7 +2806,11 @@ async function integrateGroupChange({
     window.log.info(
       `integrateGroupChange/${logId}: Applying full group state, from version ${group.revision} to ${groupState.version}`,
       {
+        isChangePresent: Boolean(groupChange),
         isChangeSupported,
+        isFirstFetch,
+        isMoreThanOneVersionUp,
+        weAreAwaitingApproval,
       }
     );
 
@@ -2810,6 +2835,12 @@ async function integrateGroupChange({
       }),
       members: getMembers(decryptedGroupState),
     };
+  }
+
+  if (!sourceConversationId || !groupChangeActions || !decryptedChangeActions) {
+    throw new Error(
+      `integrateGroupChange/${logId}: Missing necessary information that should have come from group actions`
+    );
   }
 
   window.log.info(
@@ -3809,6 +3840,30 @@ async function applyGroupChange({
   };
 }
 
+export async function decryptGroupAvatar(
+  avatarKey: string,
+  secretParamsBase64: string
+): Promise<ArrayBuffer> {
+  const sender = window.textsecure.messaging;
+  if (!sender) {
+    throw new Error(
+      'decryptGroupAvatar: textsecure.messaging is not available!'
+    );
+  }
+
+  const ciphertext = await sender.getGroupAvatar(avatarKey);
+  const clientZkGroupCipher = getClientZkGroupCipher(secretParamsBase64);
+  const plaintext = decryptGroupBlob(clientZkGroupCipher, ciphertext);
+  const blob = window.textsecure.protobuf.GroupAttributeBlob.decode(plaintext);
+  if (blob.content !== 'avatar') {
+    throw new Error(
+      `decryptGroupAvatar: Returned blob had incorrect content: ${blob.content}`
+    );
+  }
+
+  return blob.avatar.toArrayBuffer();
+}
+
 // Ovewriting result.avatar as part of functionality
 /* eslint-disable no-param-reassign */
 export async function applyNewAvatar(
@@ -3825,30 +3880,11 @@ export async function applyNewAvatar(
 
     // Group has avatar; has it changed?
     if (newAvatar && (!result.avatar || result.avatar.url !== newAvatar)) {
-      const sender = window.textsecure.messaging;
-      if (!sender) {
-        throw new Error(
-          'applyNewAvatar: textsecure.messaging is not available!'
-        );
-      }
-
       if (!result.secretParams) {
         throw new Error('applyNewAvatar: group was missing secretParams!');
       }
 
-      const ciphertext = await sender.getGroupAvatar(newAvatar);
-      const clientZkGroupCipher = getClientZkGroupCipher(result.secretParams);
-      const plaintext = decryptGroupBlob(clientZkGroupCipher, ciphertext);
-      const blob = window.textsecure.protobuf.GroupAttributeBlob.decode(
-        plaintext
-      );
-      if (blob.content !== 'avatar') {
-        throw new Error(
-          `applyNewAvatar: Returned blob had incorrect content: ${blob.content}`
-        );
-      }
-
-      const data = blob.avatar.toArrayBuffer();
+      const data = await decryptGroupAvatar(newAvatar, result.secretParams);
       const hash = await computeHash(data);
 
       if (result.avatar && result.avatar.path && result.avatar.hash !== hash) {
